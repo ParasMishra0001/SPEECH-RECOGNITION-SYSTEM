@@ -1,0 +1,48 @@
+import speech_recognition as sr
+import pyttsx3
+
+# --- Text-to-Speech Engine Setup ---
+engine = pyttsx3.init()
+engine.say("Speech recognition system is ready")
+engine.runAndWait()
+
+# --- Recognizer Object ---
+r = sr.Recognizer()
+
+# --- Predefined Commands ---
+commands = {
+    "hello": "Hello! How are you?",
+    "bye": "Goodbye! See you later.",
+    "how are you": "I'm fine, how are you?",
+    "your name": "My name is SpeechBot."
+}
+
+# --- Microphone Input and Response Loop ---
+while True:
+    try:
+        with sr.Microphone() as source:
+            print("Start speaking (say 'quit' to exit)...")
+            r.adjust_for_ambient_noise(source)  # Adjust for background noise
+            audio = r.listen(source)
+            print("Processing...")
+
+        # Speech to Text
+        text = r.recognize_google(audio)
+        text = text.lower()
+        print("You said:", text)
+
+        # Exit condition
+        if "quit" in text:
+            engine.say("Shutting down the system. Goodbye!")
+            engine.runAndWait()
+            break
+
+        # Command response
+        response = commands.get(text, "Sorry, I didn't understand that command.")
+        engine.say(response)
+        engine.runAndWait()
+
+    except sr.UnknownValueError:
+        print("Sorry, I could not understand.")
+    except sr.RequestError:
+        print("There is a problem with the Google API.")
